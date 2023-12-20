@@ -31,19 +31,21 @@ def decryptMessage(encryptMessage):
 
 def createJsonDumpedMessage(sender,message,timestamp):
     message_detail = {
-        "Sender" : sender,
-        "Message" : message,
-        "Timestamp" : timestamp
-    }
+    "Sender" : sender,
+    "Message" : message,
+    "Timestamp" : timestamp
+}
     json_dumped_message = dumps(message_detail)
     return json_dumped_message
 
 message_encrypted = encryptMessage(createJsonDumpedMessage)
 
 json_deserilised = json.loads(createJsonDumpedMessage("X","22","10"))
+#print(json_deserilised, type(message_encrypted))
+#print(pubKey, type(pubKey_export))
 
+## Exchange the pubkey with server
 
-## Exchange the RSA
 def exchangePubRSA():
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -57,7 +59,7 @@ def exchangePubRSA():
         print(f"Error on exchange: {ex}")
 
 
-### Client main messeges socket
+### SOCKET CLIENT STARTS
 exchangePubRSA()
 PORT = 65431
 try:
