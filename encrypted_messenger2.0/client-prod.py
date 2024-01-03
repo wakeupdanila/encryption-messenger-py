@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 # Network configuration
 HOST = socket.gethostname()  # Hostname of the local machine
-PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
+PORT = 65432                # Port to listen on (non-privileged ports are > 1023)
 
 # Generate RSA keys (using a larger key size for better security)
 pubKey, privKey = rsa.newkeys(2048)
@@ -17,35 +17,26 @@ pubKey, privKey = rsa.newkeys(2048)
 # Export the public key in PEM format
 pubKey_export = pubKey.save_pkcs1(format="PEM")
 
-# Get the current date and time
-now = datetime.datetime.now()
-
-
-# Create a JSON-formatted message
-def create_json_dumped_message(message):
-    message_detail = {
-        "Sender": HOST,
-        "Message": message,
-        "Date": now.strftime("%Y-%m-%d"),
-        "Timestamp": now.strftime("%H:%M:%S")
-    }
-    json_dumped_message = json.dumps(message_detail)
-    return json_dumped_message
-
-
-print(create_json_dumped_message("SomeTExtHere"))
-
-
 # Function to encrypt a message using the public key
 def encrypt_message(text, public_key):
     encrypted_message = rsa.encrypt(text.encode(), public_key)
     return encrypted_message
 
-
 # Function to decrypt a message using the private key
 def decrypt_message(encrypted_message, private_key):
     decrypted_message = rsa.decrypt(encrypted_message, private_key).decode()
     return decrypted_message
+
+# Create a JSON-formatted message
+def create_json_dumped_message(sender, message, timestamp):
+    message_detail = {
+        "Sender": sender,
+        "Message": message,
+        "Timestamp": timestamp
+    }
+    json_dumped_message = json.dumps(message_detail)
+    return json_dumped_message
+
 
 
 # Function to exchange the public RSA key with the server
@@ -63,13 +54,12 @@ def exchange_pub_rsa():
         logging.error(f"Error during key exchange: {ex}")
         return None
 
-
 # Exchange keys with server
 server_pub_key = exchange_pub_rsa()
 
 if server_pub_key:
     # Encrypt a test message with server's public key
-    message_encrypted = encrypt_message(create_json_dumped_message("SomeTxtHere"), server_pub_key)
+    message_encrypted = encrypt_message("Test Message", server_pub_key)
 
     # After key exchange, establish a new connection for messaging
     try:
