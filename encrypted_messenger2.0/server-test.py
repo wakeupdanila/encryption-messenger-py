@@ -55,6 +55,15 @@ if client_pub_key:
             s.listen()
             logging.info("Server started. Waiting for messages...")
             conn, addr = s.accept()
+            client_ip = addr[0]  # IP address of the client
+            client_port = addr[1]  # Port number of the client
+
+            try:
+                # Attempt to resolve the IP to a hostname
+                client_hostname = socket.gethostbyaddr(client_ip)[0]
+            except socket.herror:
+                # If the host cannot be found, fall back to the IP address
+                client_hostname = client_ip
 
             with conn:
                 logging.info(f"Connected by {addr}")
@@ -65,7 +74,7 @@ if client_pub_key:
                     logging.info(f"Received encrypted data")
                     decrypted_message = decrypt_message(data)
                     if decrypted_message:
-                        print(f"Decrypted Message: {decrypted_message}")
+                        print(f"Message ({client_hostname}): {decrypted_message}")
     except Exception as e:
         logging.error(f"Error during message handling: {e}")
 else:
