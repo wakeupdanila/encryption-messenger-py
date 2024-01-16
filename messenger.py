@@ -70,23 +70,26 @@ def listen_for_message(socket, private_key, other_client=False):
     try:
         data = socket.recv(4096)
         if data:
-            if other_client:
-                logging.info(f"Received from other client: {decrypt_message(data, private_key)}")
-            else:
-                logging.info(f"Received from client: {decrypt_message(data, private_key)}")
+            return decrypt_message(data, private_key)
         else:
-            return False
+            return None
     except Exception as receive_error:
         logging.error(f"Receive error: {receive_error}")
-        return False
-    return True
+        return None
 
 
 def listen_for_messages_in_background(socket, private_key, other_client=False):
     while True:
-        if not listen_for_message(socket, private_key, other_client):
-            logging.info("Stopping the listening thread.")
-            break
+        try:
+            message = listen_for_message(socket, private_key, other_client)
+            if message:
+                if other_client:
+                    logging.info(f"Received from other client: {message}")
+                else:
+                    logging.info(f"Received from client: {message}")
+        except Exception as e:
+            logging.error(f"Error receiving message: {e}")
+            break  # Break the loop to end the thread on error
 
 
 # Generate RSA keys (using a larger key size for better security)
