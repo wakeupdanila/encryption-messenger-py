@@ -5,7 +5,6 @@ import threading
 import datetime
 import json
 
-
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -18,6 +17,7 @@ RSApubKey, RSAprivKey = rsa.newkeys(2048)
 
 # Export the public key in PEM format for easier handling
 pubKey_export = RSApubKey.save_pkcs1(format="PEM")
+
 
 def get_current_time():
     return datetime.datetime.now()
@@ -38,6 +38,7 @@ def create_json_dumped_message(text):
 def encrypt_message(text, public_key):
     encrypted_message = rsa.encrypt(text.encode(), public_key)
     return encrypted_message
+
 
 # Function to decrypt a message using the private key
 def decrypt_message(encrypted_message):
@@ -68,6 +69,7 @@ def exchange_pub_rsa():
         logging.error(f"Error during key exchange: {ex}")
         return None
 
+
 def listen_for_message(conn):
     while True:
         try:
@@ -83,12 +85,14 @@ def listen_for_message(conn):
             logging.error(f"Error receiving message: {e}")
             break  # Break the loop to end the thread on error
 
+
 def send_new_message(conn, text, server_pub_key):
     try:
         message_encrypted = encrypt_message(create_json_dumped_message(text), server_pub_key)
         conn.sendall(message_encrypted)
     except Exception as message_error:
         logging.error(f"Message error: {message_error}")
+
 
 def handle_client(conn, addr, client_pub_key):
     logging.info(f"Connected by {addr}")
@@ -98,6 +102,7 @@ def handle_client(conn, addr, client_pub_key):
     # Example of sending a welcome message to the client
     send_new_message(conn, "Welcome to the server!", client_pub_key)
     listen_thread.join()
+
 
 client_pub_key = exchange_pub_rsa()
 
