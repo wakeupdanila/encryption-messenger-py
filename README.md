@@ -27,7 +27,7 @@ This project consists of two main scripts:
     pip install -r requirements.txt
     ```
 
-### Running the System
+### Running the scripts
 
 1. Start the server:
 
