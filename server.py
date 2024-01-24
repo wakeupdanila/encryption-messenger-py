@@ -3,9 +3,11 @@ import logging
 import threading
 import rsa
 
+# Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%m-%Y %H:%M:%S')
 
 
+# Function to listen for incoming messages and relay them to the other client
 def listen_for_messages_in_background(socket, client_name, other_client_socket):
     try:
         while True:
@@ -18,13 +20,16 @@ def listen_for_messages_in_background(socket, client_name, other_client_socket):
         print(f"Error receiving/sending message: {e}")
 
 
+# Main function to start the server
 def start_server():
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            # Bind the socket to a specific address and port and start listening for connections
             s.bind(('127.0.0.1', 65432))
             s.listen()
             logging.info(f"Server started. Waiting for connections...")
 
+            # Accept connections from two clients
             client1_socket, addr1 = s.accept()
             client2_socket, addr2 = s.accept()
 
@@ -36,6 +41,7 @@ def start_server():
             client1_socket.sendall(pub_key2.save_pkcs1())
             client2_socket.sendall(pub_key1.save_pkcs1())
 
+            # Start two new threads to listen for messages from each client
             listen_thread1 = threading.Thread(target=listen_for_messages_in_background, args=(
                 client1_socket, "Client 1", client2_socket))
             listen_thread2 = threading.Thread(target=listen_for_messages_in_background, args=(
