@@ -32,13 +32,13 @@ This project consists of two main scripts:
 1. Start the server:
 
     ```bash
-    python server.py
+    python3 server.py
     ```
 
 2. Start two clients (in two separate terminals):
 
     ```bash
-    python client.py
+    python3 client.py
     ```
 
 3. Follow the prompts to send and receive encrypted messages. Type 'exit' in the client to terminate.
