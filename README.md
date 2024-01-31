@@ -13,7 +13,12 @@ This project consists of two main scripts:
 
 ### Prerequisites
 
-- Ensure Python is installed on your system.
+- Ensure Python is installed on your system:
+
+    ```bash
+    python3
+    ```
+    
 - Clone the repository:
 
     ```bash
