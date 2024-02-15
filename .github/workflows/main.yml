@@ -1,0 +1,59 @@
+name: Encryption Messenger CI/CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: pytest tests/
+
+      - name: Code linting
+        run: flake8 .
+
+      - name: SAST (CodeQL)
+        uses: github/codeql-action/analyze@v2
+
+      - name: SCA (Snyk)
+        uses: snyk/actions/scan@v1
+        with:
+          args: --severity-threshold=high
+
+      - name: DAST (OWASP ZAP) 
+        uses: zaproxy/action-full-scan@v0.4.0
+        with:
+          target: 'http://localhost:65432' 
+
+      - name: Build artifact
+        run: python setup.py sdist
+
+  deploy: 
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: build-artifact
+          path: dist
+
+      - name: Deploy locally (example)
+        run: | 
+          tar -xvzf dist/*.gz
+          python server.py &
+          python client.py
